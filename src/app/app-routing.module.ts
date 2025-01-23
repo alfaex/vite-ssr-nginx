@@ -10,8 +10,7 @@ const routes: Routes = [
     // children: [
     //   {
     //     path:'',
-    //     loadComponent: () => import('src/app/lazy/lazy.component').then(c => c.LazyComponent),
-
+    //     loadComponent: () => import('src/app/lazy/lazy.component').then(c => c.LazyComponent)
     //   }
     // ]
   },

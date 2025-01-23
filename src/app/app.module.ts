@@ -30,16 +30,16 @@ import { provideHttpClient, withFetch } from '@angular/common/http';
   ],
   providers: [
     // CANNOT set APP_BASE_HREF here or all clients will have the same APP_BASE_HREF
-    // {provide: APP_BASE_HREF, useValue: '/portal/'},
+    {provide: APP_BASE_HREF, useValue: '/portal'},
     // provideHttpClient(withFetch()),
     provideHttpClient(),
     provideClientHydration(withEventReplay()),
     provideStore(appReducer),
     provideEffects(ServicosEffects),
-    provideAppInitializer(() => {
-     const service = inject(AppConfigService);
-     return service.load()
-    }),
+    // provideAppInitializer(() => {
+    //  const service = inject(AppConfigService);
+    //  return service.load()
+    // }),
     provideStoreDevtools({
       maxAge: 25
     })
