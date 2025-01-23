@@ -6,10 +6,17 @@ import { HomeComponent } from './home/home.component';
 const routes: Routes = [
   {
     path: '',
-    component: HomeComponent
+    component: HomeComponent,
+    children: [
+      {
+        path:'',
+        loadComponent: () => import('src/app/lazy/lazy.component').then(c => c.LazyComponent),
+
+      }
+    ]
   },
   {
-    path: 'portal',
+    path: 'page',
     component: PortalComponent
   }
 

@@ -1,0 +1,25 @@
+services:
+  nginx:
+    build:
+      context: nginx/
+      dockerfile: Dockerfile
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./nginx/location.conf:/etc/nginx/conf.d/location.conf
+      - ./nginx/domains/:/etc/nginx/conf.d/domains/
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+  backend:
+    build:
+      context: backend/
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+
+
+
+

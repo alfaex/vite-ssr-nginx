@@ -1,11 +1,11 @@
 import { ActionReducerMap } from "@ngrx/store"
-import * as fromXis from 'src/app/store/reducers/xis.reducers'
+import * as fromConfig from 'src/app/store/reducers/config.reducer'
 
 
 export interface State {
-  xis: fromXis.State
+  config: fromConfig.State
 }
 
 export const appReducer: ActionReducerMap<State> = {
-  xis: fromXis.reducer
+  config: fromConfig.reducer
 }
