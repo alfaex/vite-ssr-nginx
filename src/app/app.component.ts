@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
-import { PageInfo } from "candle-types";
-import * as fromRoot from './app.reducers';
+import { Component, OnInit } from '@angular/core';
+import * as fromRoot from 'src/app/app.reducers';
 import { Store } from '@ngrx/store';
 import { Observable } from "rxjs";
 
@@ -11,19 +10,15 @@ import { Observable } from "rxjs";
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'v19-module';
+  title = '4300';
 
 
-  pageInfo: PageInfo = {
-    resultsPerPage: 10,
-    totalResults: 70
-  }
-
-  jiba$: Observable<string>;
+  title$: Observable<string>;
 
   constructor(
     private store: Store<fromRoot.State>
   ){
-    this.jiba$ = this.store.select(state => state.xis.xis)
+    this.title$ = this.store.select(state => state.config.title)
   }
+
 }
