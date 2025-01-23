@@ -2,11 +2,11 @@ import { Component } from '@angular/core';
 import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-portal',
+  selector: 'app-lazy',
   imports: [RouterModule],
-  templateUrl: './portal.component.html',
-  styleUrl: './portal.component.scss'
+  templateUrl: './lazy.component.html',
+  styleUrl: './lazy.component.scss'
 })
-export class PortalComponent {
+export class LazyComponent {
 
 }

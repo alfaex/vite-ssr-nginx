@@ -4,9 +4,11 @@ import {
   isMainModule,
   writeResponseToNodeResponse,
 } from '@angular/ssr/node';
-import express from 'express';
+import express, {Router} from 'express';
 import { dirname, resolve } from 'node:path';
+import { Transform } from 'node:stream';
 import { fileURLToPath } from 'node:url';
+import { TransformCallback } from 'stream';
 
 const serverDistFolder = dirname(fileURLToPath(import.meta.url));
 const browserDistFolder = resolve(serverDistFolder, '../browser');
@@ -14,7 +16,16 @@ const browserDistFolder = resolve(serverDistFolder, '../browser');
 const app = express();
 const angularApp = new AngularNodeAppEngine();
 
-app.use(
+const router = Router();
+
+const transformStream = new TransformStream({
+  transform(chunk, controller) {
+    const modifiedText = chunk.toString().replace(/<base href=\"\/\">/, `<base href="/portal/">`);
+    controller.enqueue(modifiedText);
+  }
+});
+
+router.use('*.*',
   express.static(browserDistFolder, {
     maxAge: '1y',
     index: false,
@@ -25,14 +36,81 @@ app.use(
 /**
  * Handle all other requests by rendering the Angular application.
  */
-app.use('/**', (req, res, next) => {
+router.use('*', (req, res, next) => {
+  const host = req.get('x-forwarded-host');
+
+  if (!host) {
+    res.status(400).json({ erro: 'Host not specified' });
+    return;
+  }
+
+  // need to mantain a list of clients that uses base href
+  const bases: Record<string, string> = {
+    "potato.local": "",
+    "tomato.local": "portal"
+  }
+
+  console.log("BASE", host, bases[host], bases[host] === "");
+  // console.log("*******************************************");
+  // console.log(req);
+  // console.log("*******************************************");
+
   angularApp
-    .handle(req)
-    .then((response) =>
-      response ? writeResponseToNodeResponse(response, res) : next(),
-    )
+    .handle(req, {base: `/${bases[host]}/`})
+    .then(async (response) => {
+      console.log("///////////////////////////////////////////");
+      console.log('response', response);
+      console.log("///////////////////////////////////////////");
+      if (!response) {
+        return next();
+      }
+
+      // test if the client have base href
+      // to print the correct base href or the browser will get confused
+      if(bases[host] === ""){
+        return writeResponseToNodeResponse(response, res);
+      }else{
+        console.log("-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-");
+        console.log('AQUI');
+        console.log("-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-");
+        const reader = response?.body?.getReader();
+        const decoder = new TextDecoder();
+        let result = '';
+        let done = false;
+
+        while (!done) {
+          const readResult = await reader?.read();
+          if (readResult) {
+            const { value, done: readerDone } = readResult;
+            done = readerDone;
+            if (value) {
+              result += decoder.decode(value, { stream: !done });
+            }
+          } else {
+            done = true;
+          }
+        }
+
+        // const modifiedResult = result.replace(/<base href="\/">/, `<base href="/${bases[host]}/">`);
+        const modifiedResult = result.replace(/<base href="\/">/, `<base href="/portal/">`);
+        console.log("-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-");
+        console.log(modifiedResult);
+        console.log("-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-=x=-");
+        const newResponse = new Response(modifiedResult, response);
+
+        return writeResponseToNodeResponse(newResponse, res);
+      }
+    })
     .catch(next);
 });
+
+/**
+ * nee to do this to all base href
+ * Since theres is no way to tell angular that APP_BASE_HREF
+ * may be dynamic
+ */
+app.use('/portal', router);
+app.use('/', router);
 
 /**
  * Start the server if this module is the main entry point.
