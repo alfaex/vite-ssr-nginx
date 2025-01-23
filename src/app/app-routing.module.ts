@@ -7,19 +7,18 @@ const routes: Routes = [
   {
     path: '',
     component: HomeComponent,
-    children: [
-      {
-        path:'',
-        loadComponent: () => import('src/app/lazy/lazy.component').then(c => c.LazyComponent),
+    // children: [
+    //   {
+    //     path:'',
+    //     loadComponent: () => import('src/app/lazy/lazy.component').then(c => c.LazyComponent),
 
-      }
-    ]
+    //   }
+    // ]
   },
   {
     path: 'page',
     component: PortalComponent
   }
-
 ];
 
 @NgModule({
