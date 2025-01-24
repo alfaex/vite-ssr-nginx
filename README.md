@@ -1,59 +1,49 @@
-# V19Module
+## Modifying Hosts File
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.0.7.
+To access your development environment using a custom domain, you'll need to modify your hosts file.
 
-## Development server
-
-To start a local development server, run:
+### macOS/Linux
 
 ```bash
-ng serve
+sudo vim /etc/hosts
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Add the following line:
 
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
+```
+127.0.0.1  potato.local
+127.0.0.1  tomato.local
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+### Windows
 
-```bash
-ng generate --help
+`C:\Windows\System32\drivers\etc\hosts`
+
+Add the following line:
+
+```
+127.0.0.1  potato.local
+127.0.0.1  tomato.local
 ```
 
-## Building
+### Running the app
 
-To build the project run:
+On the project root folder run `docker compose up` and on other terminal `npm start`.
 
-```bash
-ng build
-```
+On the first run should generate the nginx and express images and start the containers.
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+### Explanation
 
-## Running unit tests
+#### Backend
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+The backend exists just to simulate getting some information from the server using the `provideAppInitializer`.
 
-```bash
-ng test
-```
+Some information should be retrieved from the server before starting loading the app because it's a multi tenant app.
 
-## Running end-to-end tests
+The generation of the url to do such a request needs to be dynamic based on the request on the SSR backend and on the location on the browser.
 
-For end-to-end (e2e) testing, run:
+#### NGINX
 
-```bash
-ng e2e
-```
+To make development easy and better debug production bugs.
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Allows to have all clients domains configured at the same time instead and check for bugs simultaneously instead of one per time using localhost.
